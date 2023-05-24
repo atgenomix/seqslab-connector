@@ -22,11 +22,11 @@ Superset db engine specs for SeqsLab
 from superset.db_engine_specs.hive import HiveEngineSpec
 
 
-class DatabricksHiveEngineSpec(HiveEngineSpec):
-    engine_name = "SeqsLab Interactive Job Cluster"
+class SeqsLabHiveEngineSpec(HiveEngineSpec):
+    engine_name = "Atgenomix SeqsLab Interactive Job"
 
     engine = "seqslab"
-    drivers = {"hive": "Hive driver for interactive job cluster"}
+    drivers = {"hive": "Hive driver for interactive job"}
     default_driver = "hive"
 
     _show_functions_column = "function"

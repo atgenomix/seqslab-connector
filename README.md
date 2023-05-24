@@ -1,2 +1,2 @@
-# seqslab-sql-connector
-SeqsLab SQL connector for Python
+# seqslab-connector
+SeqsLab Cluster/DataLake connector for Python
