@@ -44,7 +44,7 @@ cursor.close()
 ```python
 from sqlalchemy.engine import create_engine
 
-engine = create_engine('seqslab+hive://user:pass@host_ip/database?http_path=job_run_id')
+engine = create_engine('seqslab+hive://user:pass@job_cluster_host/run_name?http_path=job_run_id')
 ```
 
 #### Apache Superset
