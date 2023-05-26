@@ -11,8 +11,8 @@ on:
         required: true
         default: ''
 
-deploy:
-  test-tags:
+jobs:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
