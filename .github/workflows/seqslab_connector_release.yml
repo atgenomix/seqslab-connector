@@ -14,7 +14,7 @@ jobs:
         id: versions
         run: |
           CURRENT_TAG=${GITHUB_REF#refs/tags/}
-          CURRENT_VERSION=$(cat seqslab/__init__.py | grep "__version__"| awk '{print $3}' | sed 's/^"//'| sed 's/"$//' )
+          CURRENT_VERSION=$(cat seqslab/__init__.py | grep "__version__"| awk '{print $3}' | sed 's/^"//'| sed 's/"$//'| sed "s/'$//" )
           
           # set output
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
