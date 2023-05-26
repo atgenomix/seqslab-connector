@@ -1,0 +1,13 @@
+name: Bug
+description: Let us know about an unexpected error, a crash, or an incorrect behavior.
+labels:
+  - 'bug'
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+    validations:
+      required: true
+
+
