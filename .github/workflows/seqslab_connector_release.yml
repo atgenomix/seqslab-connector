@@ -1,11 +1,15 @@
-name: seqslab connector staging
+name: seqslab connector publish
 on:
   workflow_dispatch:
     inputs:
-      draftRelease:
-        description: 'Create Draft Release ?'
+      User:
+        description: 'Pypi User'
         required: true
-        default: 'Yes'
+        default: '__token__'
+      Password:
+        description: 'Pypi  Password'
+        required: true
+        default: ''
 
 jobs:
   test-tags:
@@ -82,9 +86,9 @@ jobs:
           echo "Print CURRENT_VERSION"
           echo ${{ steps.versions.outputs.CURRENT_VERSION }}
 
-      # Publish pre Release
-      - name: Create Seqslab Connector Draft Release
-        if: (github.ref == 'refs/heads/main') && (github.event.inputs.draftRelease == 'Yes') && success()
+      # Publish Release
+      - name: Create Seqslab Connector Release
+        if: (github.ref == 'refs/heads/main') && success()
         id: create_release
         uses: actions/create-release@v1
         with:
@@ -94,6 +98,42 @@ jobs:
             TimeStamp
             - timestamp = ${{ steps.date.outputs.NOW }}
           draft: false
-          prerelease: true
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install wheel twine
+
+      - name: Build dist
+        run: python setup.py sdist bdist_wheel --python-tag py3
+
+      - name: Archive dist
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: |
+            dist/*.tar.gz
+            dist/*.whl
+
+      - name: Verify long description rendering
+        run: twine check dist/*
+
+      - name: Publish distribution 📦 to PyPI
+        env:
+          PYPI_API_USER: ${{ github.event.inputs.User }}
+          PYPI_API_TOKEN: ${{ github.event.inputs.Password }}
+        run: |
+          twine upload --non-interactive -u "${PYPI_API_USER}" -p "${PYPI_API_TOKEN}" dist/*
