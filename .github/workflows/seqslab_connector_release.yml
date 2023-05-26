@@ -11,7 +11,7 @@ on:
         required: true
         default: ''
 
-jobs:
+deploy:
   test-tags:
     runs-on: ubuntu-latest
     steps:
@@ -30,12 +30,8 @@ jobs:
           # set output
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Print versioning information
-        run: |
-          echo "Print CURRENT_VERSION"
-          echo ${{ steps.versions.outputs.CURRENT_VERSION }}
-
-      - uses: mukunku/tag-exists-action@v1.2.0
+      - name: Check Tag
+        uses: mukunku/tag-exists-action@v1.2.0
         id: checkTag
         with:
           tag: "${{ steps.versions.outputs.CURRENT_VERSION }}"
@@ -52,54 +48,6 @@ jobs:
           else
             echo "${{ steps.versions.outputs.CURRENT_VERSION }} does not exist"
           fi      
-
-
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-
-      - name: Get Current Timestamp
-        if: success()
-        id: date
-        run: echo "NOW=$(date +'%Y-%m-%d-%H-%M')">> $GITHUB_OUTPUT
-
-      - name: Get versioning information
-        id: versions
-        run: |
-          CURRENT_TAG=${GITHUB_REF#refs/tags/}
-          CURRENT_VERSION=$(cat seqslab/__init__.py | grep "__version__"| awk '{print $3}' | sed 's/^"//'| sed 's/"$//' )
-          
-          # set output
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Print versioning information
-        run: |
-          # set output
-          echo "Print Datetime"
-          echo ${{ steps.date.outputs.NOW }}
-          echo "Print CURRENT_VERSION"
-          echo ${{ steps.versions.outputs.CURRENT_VERSION }}
-
-      # Publish Release
-      - name: Create Seqslab Connector Release
-        if: (github.ref == 'refs/heads/main') && success()
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ steps.versions.outputs.CURRENT_VERSION }}
-          release_name: ${{ steps.versions.outputs.CURRENT_VERSION }}
-          body: |
-            TimeStamp
-            - timestamp = ${{ steps.date.outputs.NOW }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
 
       - name: Install Python dependencies
         run: |
@@ -128,10 +76,18 @@ jobs:
         run: |
           twine upload --non-interactive -u "${PYPI_API_USER}" -p "${PYPI_API_TOKEN}" dist/*
 
-      # delete release if deploy fail
-      - uses: dev-drprasad/delete-tag-and-release@v1.0 # PRERELEASE is v1.0 and can also be used to test and give us feedback
-        if: steps.deploy.outputs.exit_code != 0
+      # Publish Release
+      - name: Create Seqslab Connector Release
+        if: (github.ref == 'refs/heads/main') && success()
+        id: create_release
+        uses: actions/create-release@v1
         with:
-          tag_name: ${{ steps.versions.outputs.CURRENT_VERSION }} #(required) tag name to delete
-          github_token: ${{ secrets.GITHUB_TOKEN }} # (required) a GitHub token with write access to the repo that needs to be modified
-          delete_release: true
+          tag_name: ${{ steps.versions.outputs.CURRENT_VERSION }}
+          release_name: ${{ steps.versions.outputs.CURRENT_VERSION }}
+          body: |
+            No Dependencies
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+

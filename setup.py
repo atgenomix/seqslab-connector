@@ -12,8 +12,7 @@ setup_file_loc: Union[Union[str, bytes], Any] = os.path.abspath(
 # allow setup.py to be run from any path
 os.chdir(setup_file_loc)
 
-extras_require = {
-}
+extras_require = {}
 
 
 def get_requirement():
@@ -52,8 +51,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.10'
     ],
     data_files=[('requirements', ['requirements.txt'])],
     install_requires=get_requirement(),
