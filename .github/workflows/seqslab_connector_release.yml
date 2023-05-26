@@ -1,15 +1,5 @@
 name: seqslab connector release
-on:
-  workflow_dispatch:
-    inputs:
-      User:
-        description: 'Pypi User'
-        required: true
-        default: '__token__'
-      Password:
-        description: 'Pypi Password'
-        required: true
-
+on: workflow_dispatch
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -70,10 +60,10 @@ jobs:
       - name: Publish distribution 📦 to PyPI
         id: deploy
         env:
-          PYPI_API_USER: ${{ github.event.inputs.User }}
-          PYPI_API_TOKEN: ${{ github.event.inputs.Password }}
+          PYPI_API_USER: __token__
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          twine upload --non-interactive -u "${PYPI_API_USER}" -p "${PYPI_API_TOKEN}" dist/*
+          twine upload --non-interactive -u "${PYPI_API_USER}" -p "${PYPI_API_TOKEN}" dist/* --verbose
 
       # Publish Release
       - name: Create Seqslab Connector Release
