@@ -7,9 +7,8 @@ on:
         required: true
         default: '__token__'
       Password:
-        description: 'Pypi  Password'
+        description: 'Pypi Password'
         required: true
-        default: ''
 
 jobs:
   deploy:
