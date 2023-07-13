@@ -18,8 +18,10 @@
 """
 Superset db engine specs for SeqsLab
 """
-
+from superset.db_engine_specs import BaseEngineSpec
 from superset.db_engine_specs.hive import HiveEngineSpec
+from superset.exceptions import SupersetException
+from superset import sql_parse
 
 
 class SeqsLabHiveEngineSpec(HiveEngineSpec):
@@ -44,3 +46,11 @@ class SeqsLabHiveEngineSpec(HiveEngineSpec):
         "P1W/1970-01-03T00:00:00Z": "date_trunc('week', {col} + interval '1 day') + interval '5 days'",
         "1969-12-28T00:00:00Z/P1W": "date_trunc('week', {col} + interval '1 day') - interval '1 day'",
     }
+
+    @staticmethod
+    def execute(  # type: ignore
+        cursor, query: str, **kwargs
+    ):  # pylint: disable=arguments-differ
+        if not BaseEngineSpec.is_readonly_query(sql_parse.ParsedQuery(query)):
+            raise SupersetException("DML operation is currently not supported")
+        HiveEngineSpec.execute(cursor, query, **kwargs)
