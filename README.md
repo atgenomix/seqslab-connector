@@ -31,7 +31,8 @@ For Apache Superset integration install with
 ```python
 from seqslab import hive
 
-cursor = hive.connect(database='run_name', http_path='job_run_id', username='user', password='pass', host='job_cluster_host')
+conn = hive.connect(database='run_name', http_path='job_run_id', username='user', password='pass', host='job_cluster_host')
+cursor = conn.cursor()
 cursor.execute('SHOW TABLES')
 print(cursor.fetchall())
 cursor.execute('SELECT * FROM my_workflow_table_name LIMIT 10')
