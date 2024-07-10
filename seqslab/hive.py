@@ -23,6 +23,7 @@ import base64
 import ssl
 
 from pyhive import hive
+from pyhive.exc import OperationalError
 from thrift.transport import THttpClient
 
 # PEP 249 module globals
@@ -75,4 +76,9 @@ def connect(
     )
     thrift_transport.setCustomHeaders({"Authorization": f"Basic {auth}"})
 
-    return hive.Connection(database=database, thrift_transport=thrift_transport, **kwargs)
+    try:
+        conn = hive.Connection(database=database, thrift_transport=thrift_transport, **kwargs)
+    except OperationalError:
+        # most likely database not found, fall back to default database
+        conn = hive.Connection(database="default", thrift_transport=thrift_transport, **kwargs)
+    return conn
